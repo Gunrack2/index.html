@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Wave Report</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wave Report</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Wave Height (m)</th>
+        <th>Wave Direction</th>
+      </tr>
+    </thead>
+    <tbody id="wave-data"></tbody>
+  </table>
+  <script>
+    const API_KEY = 'e45957c2-eb6d-11ed-92e6-0242ac130002-e459586c-eb6d-11ed-92e6-0242ac130002';
+    const url = `https://api.stormglass.io/v2/weather/point?lat=36.7245&lng=-75.9229&params=waveHeight,windDirection`;
+    const options = {
+      headers: {
+        'Authorization': API_KEY
+      }
+    };
+
+    fetch(url, options)
+      .then(response => response.json())
+      .then(data => {
+        const waveData = data.hours.map(hour => {
+          return {
+            date: new Date(hour.time).toLocaleString(),
+            waveHeight: hour.waveHeight[0].value,
+            waveDirection: hour.windDirection[0].direction
+          };
+        });
+
+        const tableBody = document.getElementById('wave-data');
+        waveData.forEach(data => {
+          const row = document.createElement('tr');
+          const dateCell = document.createElement('td');
+          dateCell.textContent = data.date;
+          row.appendChild(dateCell);
+          const waveHeightCell = document.createElement('td');
+          waveHeightCell.textContent = data.waveHeight;
+          row.appendChild(waveHeightCell);
+          const waveDirectionCell = document.createElement('td');
+          waveDirectionCell.textContent = data.waveDirection;
+          row.appendChild(waveDirectionCell);
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => console.error(error));
+  </script>
+</body>
+</html>
